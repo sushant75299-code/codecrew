@@ -1,4 +1,15 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from database import engine, Base
+import models
+
+from routers.auth import router as auth_router
+from routers.products import router as products_router
+
+
+Base.metadata.create_all(bind=engine)
+
 
 from database import Base, engine
 from inventory.router import router as inventory_router
@@ -13,6 +24,19 @@ app = FastAPI(
 )
 
 app.include_router(inventory_router)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+app.include_router(auth_router)
+app.include_router(products_router)
 
 
 @app.get("/")
