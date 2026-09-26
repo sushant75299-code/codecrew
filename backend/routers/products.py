@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import Product, User
+from schemas import ProductCreate, ProductUpdate, ProductResponse
 from dependencies import get_current_user
 
 
@@ -12,24 +13,19 @@ router = APIRouter(
 )
 
 
-@router.post("/")
+@router.post("/", response_model=ProductResponse)
 def create_product(
-    name: str,
-    sku: str,
-    category: str,
-    unit: str,
-    stock: float = 0,
-    reorder_level: float = 0,
+    product_data: ProductCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     product = Product(
-        name=name,
-        sku=sku,
-        category=category,
-        unit=unit,
-        stock=stock,
-        reorder_level=reorder_level,
+        name=product_data.name,
+        sku=product_data.sku,
+        category=product_data.category,
+        unit=product_data.unit,
+        stock=product_data.stock,
+        reorder_level=product_data.reorder_level,
         user_id=current_user.id
     )
 
@@ -40,27 +36,20 @@ def create_product(
     return product
 
 
-@router.get("/")
+@router.get("/", response_model=list[ProductResponse])
 def get_products(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    products = db.query(Product).filter(
+    return db.query(Product).filter(
         Product.user_id == current_user.id
     ).all()
 
-    return products
 
-
-@router.put("/{product_id}")
+@router.put("/{product_id}", response_model=ProductResponse)
 def update_product(
     product_id: int,
-    name: str,
-    sku: str,
-    category: str,
-    unit: str,
-    stock: float,
-    reorder_level: float,
+    product_data: ProductUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -75,12 +64,12 @@ def update_product(
             detail="Product not found"
         )
 
-    product.name = name
-    product.sku = sku
-    product.category = category
-    product.unit = unit
-    product.stock = stock
-    product.reorder_level = reorder_level
+    product.name = product_data.name
+    product.sku = product_data.sku
+    product.category = product_data.category
+    product.unit = product_data.unit
+    product.stock = product_data.stock
+    product.reorder_level = product_data.reorder_level
 
     db.commit()
     db.refresh(product)
