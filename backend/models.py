@@ -23,3 +23,11 @@ class Product(Base):
     reorder_level = Column(Float, default=0)
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+class PasswordResetOTP(Base):
+    __tablename__ = "password_reset_otps"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, nullable=False, index=True)
+    otp = Column(String, nullable=False)
+    expires_at = Column(String, nullable=False)
