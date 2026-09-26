@@ -3,7 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database import Base, engine
 
-from routers.stock_adjustments import router as stock_adjustments_router
+from routers.stock_adjustments import (
+    router as stock_adjustments_router,
+    stock_router,
+    adjustments_router
+)
 from routers.products import router as products_router
 
 
@@ -20,6 +24,8 @@ app = FastAPI(
 
 # Register routers
 app.include_router(stock_adjustments_router)
+app.include_router(stock_router)
+app.include_router(adjustments_router)
 app.include_router(products_router)
 
 
