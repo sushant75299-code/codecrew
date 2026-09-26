@@ -6,8 +6,9 @@ from database import Base, engine
 from routers.stock_adjustments import (
     router as stock_adjustments_router,
     stock_router,
-    adjustments_router
+    adjustments_router,
 )
+
 from routers.products import router as products_router
 
 
@@ -18,7 +19,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="StockSense API",
     description="Inventory Management System Backend",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 
@@ -32,8 +33,8 @@ app.include_router(products_router)
 # Allow Flutter frontend to communicate with FastAPI
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -43,12 +44,12 @@ app.add_middleware(
 def home():
     return {
         "message": "Welcome to StockSense API",
-        "status": "running"
+        "status": "running",
     }
 
 
 @app.get("/health")
 def health_check():
     return {
-        "status": "healthy"
+        "status": "healthy",
     }
